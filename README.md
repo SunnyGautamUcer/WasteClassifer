@@ -23,9 +23,9 @@ This project not only helps in classifying waste but also educates users on prop
 # How to Run 
 
 1.Install all the required libraries into a virtual environment .
-2.Run the app.py
-3.Go to browser - localhost:3000 
-4.Now you are good to go
+2.Run the app.py.
+3.Go to browser - localhost:3000 .
+4.Now you are good to go.
 
 # Contact :
 For any queries : gautamsunny02@gmail.com 
