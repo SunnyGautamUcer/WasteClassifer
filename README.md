@@ -19,3 +19,13 @@ User Feedback: Allow users to provide feedback on the classification accuracy, w
 Educational Resources: Provide users with more detailed information and resources on waste management and recycling practices.
 Mobile Application: Develop a mobile version of the application for easier access and usage.
 This project not only helps in classifying waste but also educates users on proper waste management and recycling practices, contributing to a cleaner environment.
+
+# How to Run 
+
+1.Install all the required libraries into a virtual environment .
+2.Run the app.py
+3.Go to browser - localhost:3000 
+4.Now you are good to go
+
+# Contact :
+For any queries : gautamsunny02@gmail.com 
