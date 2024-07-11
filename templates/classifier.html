@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" href="static/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f2f2f2;
+      font-family: Arial, sans-serif;
+    }
+    .title {
+      margin-top: 0px;
+      font-family: 'Sora';
+      color: #75480e;
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-align: center;
+    }
+    .p {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+    img {
+      margin-top: 40px;
+      margin-left: 150px;
+      margin-right: 60px;
+    }
+    .container {
+      max-width: 100%;
+      margin: 50px auto 0; 
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    #videoWrapper {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 20px;
+      margin-left: 100px; 
+    }
+    #videoElement {
+      max-width: 440px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    #capturedImageContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 440px; 
+      margin-left: 50px;
+    }
+    #capturedImage {
+      width: 440px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: none;
+      margin-bottom: 10px;
+      margin-top: 40px;
+    }
+    
+    #imageText {
+      width: 100%;
+      text-align: center;
+      margin-top: 0px;
+      margin-right: 3px;
+      margin-bottom: 5px;
+    }
+    #predictionResult{
+      margin-left: 90px;
+    }
+    #result {
+      text-align: center;
+      margin-top: 30px;
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+    .button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      margin-top: 0px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+      margin-left: 250px;
+    }
+    .button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <h2 class="logo"><a href="#">Waste Classifier</a></h2>
+      <input type="checkbox" id="menu-toggler">
+      <label for="menu-toggler" id="hamburger-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px">
+          <path d="M0 0h24v24H0z" fill="none"/>
+          <path d="M3 18h18v-2H3v2zm0-5h18V11H3v2zm0-7v2h18V6H3z"/>
+        </svg>
+      </label>
+      <ul class="all-links">
+        <li><a href="index.html#home">Home</a></li>
+        <li><a href="classifier.html">Classifier</a></li>
+        <li><a href="craft.html">Craft</a></li>
+        <li><a href="index.html#about">About Us</a></li>
+        <li><a href="index.html#contact">Contact Us</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div class="container">
+    <section class="title">Garbage Classification</section>
+    <p class="p">Categories into which wastes will be classified:-</p>
+    <img src="static\css\1.png" alt="" class="1" width="150" height="200">
+    <img src="static\css\2.png" alt="" class="2" width="150" height="200">
+    <img src="static\css\3.png" alt="" class="3" width="150" height="200">
+    <br><br>
+    <div id="videoWrapper">
+      <video id="videoElement" autoplay></video>
+      <div id="capturedImageContainer">
+        <img id="capturedImage" width="350" height="240" style="display: none;">
+        <div id="imageText"></div>
+        <div id="predictionResult" ></div>
+      </div>
+    </div>
+    <button id="capture" class="button" type="button">Click to classify</button>
+    <p><br><span style="color: #FF5F15;">WARNING:</span>&nbsp;We should not dump electronic items in the trash can because they contain hazardous materials that can harm the environment</p>
+  </div>
+
+  <center>
+    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+    <script>
+      const video = document.getElementById('videoElement');
+      const canvas = document.getElementById('canvas');
+      const captureButton = document.getElementById('capture');
+      const context = canvas.getContext('2d');
+      const capturedImage = document.getElementById('capturedImage');
+      const imageText = document.getElementById('imageText');
+      const predictionResult = document.getElementById('predictionResult');
+    
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+          video.srcObject = stream;
+        });
+    
+      captureButton.addEventListener('click', () => {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        capturedImage.src = canvas.toDataURL('image/jpeg');
+        capturedImage.style.display = 'block';
+        imageText.textContent = ''; 
+        
+        const imageData = capturedImage.src.split(',')[1];
+        
+      
+        fetch('/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ image_data: imageData })
+        })
+        .then(response => response.json())
+        .then(data => {
+          predictionResult.textContent = `Prediction: ${data.prediction}`;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      });
+    </script>
+    
+    
+  </center>
+</body>
+</html>
