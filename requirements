@@ -1,0 +1,9 @@
+Python - 3.9 
+
+# libraries :
+
+flask - 3.0.3
+tensorflow - 2.14.0
+pillow - 10.4.0
+numpy - 2.0.0
+keras - 3.4.1
